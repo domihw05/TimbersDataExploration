@@ -2,7 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from mplsoccer import VerticalPitch
 
+
 df = pd.read_csv('erling_haaland_2022_understat.csv')
+
 
 # Scale x and y coordinates properly
 df['X'] = df['X'] * 100
