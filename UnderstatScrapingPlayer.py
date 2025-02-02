@@ -3,6 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import pandas as pd
+import streamlit as st
 
 import matplotlib.pyplot as plt
 from mplsoccer import VerticalPitch
@@ -78,10 +79,10 @@ def json_to_df(data):
 
 def parse_data():
     # scrape single game shots
-    base_url = 'https://understat.com/match/'
+    base_url = 'https://understat.com/player/'
 
 
-    #id = str(input(f'Please enter the match id: '))
+    #id = str(input(f'Please enter the player id: '))
     #url = base_url + id
     url = 'https://understat.com/player/8418' #JM42
 
@@ -126,7 +127,7 @@ def print_shot_map(df):
     # Black color
     background_color = '#0C0D0E'
 
-    font_path = 'Fonts/Arvo-Regular.ttf'
+    font_path = 'Fonts/Poppins/Poppins-Medium.ttf'
     font_props = font_manager.FontProperties(fname=font_path)
 
     fig = plt.figure(figsize=(8,12))
@@ -142,9 +143,9 @@ def print_shot_map(df):
     # PLAYER NAME
     ax1.text(
         x=0.5,
-        y=0.85,
+        y=0.9,
         s=player_name,
-        fontsize = 20,
+        fontsize = 25,
         fontproperties = font_props,
         fontweight = 'bold',
         color = 'white',
@@ -156,7 +157,7 @@ def print_shot_map(df):
         x=0.5,
         y=0.75,
         s=f'Career Shot Chart',
-        fontsize = 14,
+        fontsize = 16,
         fontproperties = font_props,
         fontweight = 'bold',
         color = 'white',
@@ -230,49 +231,48 @@ def print_shot_map(df):
     # GOAL VS NO GOAL
 
     ax1.text(
-        x=0.15, 
-        y=0.41, 
+        x=0.45, 
+        y=0.27, 
         s=f'Goal', 
         fontsize=10, 
         fontproperties=font_props, 
         color='white', 
         ha='right'
     )
+    ax1.scatter(
+        x=0.47, 
+        y=0.3, 
+        s=100, 
+        color='Green', 
+        edgecolor='white', 
+        linewidth=.8,
+        alpha=.7
+    )
+
+
+    ax1.scatter(
+        x=0.53, 
+        y=0.3, 
+        s=100, 
+        color=background_color, 
+        edgecolor='white', 
+        linewidth=.8
+    )
 
     ax1.text(
-        x=0.15, 
-        y=0.31, 
-        s=f'Miss', 
+        x=0.55, 
+        y=0.27, 
+        s=f'No Goal', 
         fontsize=10, 
         fontproperties=font_props, 
         color='white', 
-        ha='right'
-    )
-
-    ax1.scatter(
-        x=0.18, 
-        y=0.44, 
-        s=80, 
-        color= 'green', 
-        edgecolor='white', 
-        linewidth=1,
-        alpha=.7
-    )
-
-    ax1.scatter(
-        x=0.18, 
-        y=0.34, 
-        s=100, 
-        color='red',
-        edgecolor = 'white',
-        linewidth = 1, 
-        alpha=.7
+        ha='left'
     )
 
     ax1.set_axis_off()
 
 
-    ax2 = fig.add_axes([0.05,.25,.9,.5]) # Top left, bottom left, width, height
+    ax2 = fig.add_axes([0.05,.27,.9,.5]) # Top, left, width, height
     ax2.set_facecolor(background_color)
 
     pitch = VerticalPitch(
@@ -293,14 +293,17 @@ def print_shot_map(df):
             x['x'],
             x['y'],
             s=300 * x['xg'],
-            color = 'green' if x['result'] == 'Goal' else 'red',
+            color = 'green' if x['result'] == 'Goal' else background_color,
             ax = ax2,
             alpha = 0.7,
-            linewidth = 1,
+            linewidth = 0.8,
             edgecolor = 'white'
         )
 
     ax2.set_axis_off()
+
+    # Toggle only 2024 season
+    #df = df[df['season'] == '2024']
 
     total_shots = df.shape[0]
     total_goals = df[df['result'] == 'Goal'].shape[0]
@@ -310,48 +313,66 @@ def print_shot_map(df):
     ax3 = fig.add_axes([0,.2,1,.05]) # Top left, bottom left, width, height
     ax3.set_facecolor(background_color)
 
-    ax3.text(x=0.25,y=0.5,s='Shots',fontsize = 20, fontproperties = font_props,
+    ax3.text(x=0.25,y=0.6,s='Shots',fontsize = 20, fontproperties = font_props,
          fontweight='bold',color='white',ha = 'center')
     
-    ax3.text(x = 0.25,y=0, s=f"{total_shots}",fontsize=16,
-            fontproperties = font_props,color='red',ha='center')
+    ax3.text(x = 0.25,y=0.1, s=f"{total_shots}",fontsize=16,
+            fontproperties = font_props,color='green',ha='center')
 
-    ax3.text(x=0.42,y=0.5,s='Goals',fontsize = 20, fontproperties = font_props,
+    ax3.text(x=0.42,y=0.6,s='Goals',fontsize = 20, fontproperties = font_props,
             fontweight='bold',color='white',ha = 'center')
-    ax3.text(x = 0.42,y=0, s=f"{total_goals}",fontsize=16,
-            fontproperties = font_props,color='red',ha='center')
+    ax3.text(x = 0.42,y=0.1, s=f"{total_goals}",fontsize=16,
+            fontproperties = font_props,color='green',ha='center')
 
-    ax3.text(x=0.55,y=0.5,s='xG',fontsize = 20, fontproperties = font_props,
+    ax3.text(x=0.55,y=0.6,s='xG',fontsize = 20, fontproperties = font_props,
             fontweight='bold',color='white',ha = 'center')
-    ax3.text(x = 0.55,y=0, s=f"{total_xG:.2f}",fontsize=16,
-            fontproperties = font_props,color='red',ha='center')
+    ax3.text(x = 0.55,y=0.1, s=f"{total_xG:.2f}",fontsize=16,
+            fontproperties = font_props,color='green',ha='center')
 
-    ax3.text(x=0.69,y=0.5,s='xG/Shot',fontsize = 20, fontproperties = font_props,
+    ax3.text(x=0.69,y=0.6,s='xG/Shot',fontsize = 20, fontproperties = font_props,
             fontweight='bold',color='white',ha = 'center')
-    ax3.text(x = 0.69,y=0, s=f"{xG_per_shot:.2f}",fontsize=16,
-            fontproperties = font_props,color='red',ha='center')
+    ax3.text(x = 0.69,y=0.1, s=f"{xG_per_shot:.2f}",fontsize=16,
+            fontproperties = font_props,color='green',ha='center')
     
     goals_only = df[df['result'] == 'Goal']
     top_assisters = goals_only['player_assisted'].value_counts().head(5)
     top_assists = top_assisters.tolist()
     top_assisters = top_assisters.index.tolist()
 
-    for idx in range(5):
-        name = top_assisters[idx]
-        assists = top_assists[idx]
+    ax3.text(x=0.5,y=-1,s='Top Assisters',fontsize = 20, fontproperties = font_props,
+            fontweight='bold',color='white',ha = 'center')
 
-        ax3.text(x = 0.5,y=-2 - idx, s=f"{name} - {assists:.2f} assists",fontsize=16,
-            fontproperties = font_props,color='white',ha='center')
+    for idx in range(3):
+        # Only print if valid index
+        if idx < len(top_assisters): 
+            name = top_assisters[idx]
+            assists = top_assists[idx]
 
-
-
-
-
+            ax3.text(x = 0.365,y=-1.5 - (idx*0.4), s=f"{idx+1}. {name} - {assists:.0f} assists",fontsize=12,
+                fontproperties = font_props,color='white',ha='left')
+            
     ax3.set_axis_off()
+
+    #STREAMLIT SHIT
+    #st.pyplot(fig)
+
+def app():
+    # Streamlit UI
+    st.title("Player Assist Visualization")
+
+    player_id = st.text_input("Enter Player ID")
+    season = st.selectbox("Select Season", ["2021", "2022", "2023"])
+
+    if st.button("Generate Visualization"):
+        data = parse_data()
+
+        print_shot_map(data)
 
 if __name__ == '__main__':
     df = parse_data()
 
     print_shot_map(df)
 
-    plt.show()
+    plt.savefig("player_visualization.png", dpi=300)  # Higher dpi for better quality
+    plt.close()  # Close the figure to free memory
+    #app()
