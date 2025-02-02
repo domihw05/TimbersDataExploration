@@ -65,6 +65,7 @@ def parse_data():
 
     id = str(input(f'Please enter the match id: '))
     url = base_url + id
+    url = 'https://understat.com/player/8418' #JM42
 
     res = requests.get(url)
     soup = BeautifulSoup(res.content,'lxml')
@@ -75,7 +76,10 @@ def parse_data():
 
     # get only shots data
 
-    strings = scripts[1].string
+    #strings = scripts[1].string #MATCH
+    strings = scripts[3].string #PLAYER
+
+    print(strings)
 
     # strip symbols so we only have the json data
 
