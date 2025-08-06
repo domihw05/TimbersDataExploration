@@ -84,9 +84,10 @@ def calculate_percentiles(grouped_data, player_name='Felipe Carballo', position=
 
     return percentile
 
-def draw_radar_chart(percentile,player_name,position_name,team_name,season):
+def draw_radar_chart(percentile,player_name,position_name,team_name,season,compare = False,second_percentile = None, second_season = None):
     from mplsoccer import Radar, FontManager, grid
     import matplotlib.pyplot as plt
+    from matplotlib.patches import Patch
 
     URL1 = ('https://raw.githubusercontent.com/googlefonts/SourceSerifProGFVersion/main/fonts/'
             'SourceSerifPro-Regular.ttf')
@@ -132,20 +133,37 @@ def draw_radar_chart(percentile,player_name,position_name,team_name,season):
     radar.setup_axis(ax=ax['radar'])
 
     rings_inner = radar.draw_circles(ax=ax['radar'], facecolor="#F7B10C", edgecolor='#F7B10C')
+    legend_handles = [Patch(color="#175922", label=season)]
+
+    if compare and second_percentile is not None:
+        second_radar_output = radar.draw_radar(second_percentile, ax=ax['radar'],
+                                               kwargs_radar={'facecolor': "#8A0F17", 'alpha': 0.7},
+                                               kwargs_rings={'facecolor': "#65100B", 'alpha': 0.7})
+        legend_handles.append(Patch(color="#8A0F17", label=second_season))
+
     radar_output = radar.draw_radar(percentile, ax=ax['radar'],
-                                    kwargs_radar={'facecolor': "#175922"},
-                                    kwargs_rings={'facecolor': "#143A18"})
+                                    kwargs_radar={'facecolor': "#175922",'alpha': 0.7 if compare else 1},
+                                    kwargs_rings={'facecolor': "#143A18",'alpha': 0.7 if compare else 1})
+    
+
+    
+
     radar_poly, rings_outer, vertices = radar_output
     range_labels = radar.draw_range_labels(ax=ax['radar'], fontsize=25,
                                         fontproperties=serif_regular.prop)
     param_labels = radar.draw_param_labels(ax=ax['radar'], fontsize=25,
                                         fontproperties=serif_regular.prop)
+    
+    # Add legend
+    ax['radar'].legend(handles=legend_handles, loc='upper right', fontsize=18, 
+                       frameon=True,bbox_to_anchor=(1, 0.99))  # (x, y) where y < 1 moves it down
+
 
     # adding the endnote and title text (these axes range from 0-1, i.e. 0, 0 is the bottom left)
     # Note we are slightly offsetting the text from the edges by 0.01 (1%, e.g. 0.99)
     endnote_text = ax['endnote'].text(0.99, 0.5, 'Made by TotalTimbers - Statistics via American Soccer Analysis - Percentiles Based on G+ of Positional Peers with >800 Minutes this Season', fontsize=15,
                                     fontproperties=robotto_thin.prop, ha='right', va='center')
-    title1_text = ax['title'].text(0.01, 0.6, player_name + f' ({season})', fontsize=40,
+    title1_text = ax['title'].text(0.01, 0.6, player_name, fontsize=40,
                                     fontproperties=robotto_bold.prop, ha='left', va='center')
     title2_text = ax['title'].text(0.01, 0.05, team_name, fontsize=25,
                                     fontproperties=robotto_thin.prop,
@@ -158,24 +176,40 @@ def draw_radar_chart(percentile,player_name,position_name,team_name,season):
     
     new_name_arr = player_name.split(' ')
     new_name = new_name_arr[0] + new_name_arr[1]
+    if compare:
+        outpath = f"Output/{new_name}_{season}_vs_{second_season}_spiderchart.png"
+    else:
+        outpath = f"Output/{new_name}_{season}_spiderchart.png"
 
-    plt.savefig(f"Output/{new_name}_{season}_spiderchart.png", dpi=300, bbox_inches='tight')
+    plt.savefig(outpath, dpi=300, bbox_inches='tight')
 
 
 
 if __name__ == "__main__":
     # Get the data
     (season, player_name, position, 
-     position_name, team_name) = ('2024',
+     position_name, team_name) = ('2025',
+                                  'Felipe Mora',
+                                  'ST', 
+                                  'Striker', 
+                                  'Portland Timbers')
+    (season2, player_name2, position2, 
+     position_name2, team_name2) = ('2024',
                                   'Felipe Mora',
                                   'ST', 
                                   'Striker', 
                                   'Portland Timbers')
 
     grouped_data = get_data(season)
+    grouped_data2 = get_data(season2)
 
     # Calculate percentiles for a specific player
     percentile = calculate_percentiles(grouped_data, player_name=player_name, position=position)
+    second_percentile = calculate_percentiles(grouped_data2, player_name=player_name2, position=position2)
 
     # Draw the radar chart
-    draw_radar_chart(percentile, player_name=player_name, position_name=position_name, team_name=team_name, season = season)
+    draw_radar_chart(percentile, player_name=player_name, 
+                     position_name=position_name, team_name=team_name, 
+                     season = season, compare=True,
+                     second_percentile=second_percentile,
+                     second_season=season2)
