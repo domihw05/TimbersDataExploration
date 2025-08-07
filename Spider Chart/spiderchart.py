@@ -58,7 +58,7 @@ def get_data(season_name='2025', use_cache=True):
     grouped_data['goals_added_above_avg_per90'] = grouped_data['goals_added_above_avg'] / (grouped_data['minutes_played'] / 90)
 
     # Step 4: (Optional) Add player names for better readability
-    grouped_data = pd.merge(grouped_data, main_df[['player_id', 'player_name','general_position']].drop_duplicates(), on='player_id', how='left')
+    grouped_data = pd.merge(grouped_data, main_df[['player_id', 'player_name','general_position','team_id']].drop_duplicates(), on='player_id', how='left')
 
     grouped_data.to_parquet(cache_path)
     return grouped_data
@@ -132,13 +132,13 @@ def draw_radar_chart(percentile,player_name,position_name,team_name,season,compa
     # plot the radar
     radar.setup_axis(ax=ax['radar'])
 
-    rings_inner = radar.draw_circles(ax=ax['radar'], facecolor="#F7B10C", edgecolor='#F7B10C')
+    rings_inner = radar.draw_circles(ax=ax['radar'], facecolor="#FFBE27", edgecolor='#FFBE27')
     legend_handles = [Patch(color="#175922", label=season)]
 
     if compare and second_percentile is not None:
         second_radar_output = radar.draw_radar(second_percentile, ax=ax['radar'],
-                                               kwargs_radar={'facecolor': "#8A0F17", 'alpha': 0.7},
-                                               kwargs_rings={'facecolor': "#65100B", 'alpha': 0.7})
+                                               kwargs_radar={'facecolor': "#8A0F17", 'alpha': 0.8},
+                                               kwargs_rings={'facecolor': "#65100B", 'alpha': 0.8})
         legend_handles.append(Patch(color="#8A0F17", label=second_season))
 
     radar_output = radar.draw_radar(percentile, ax=ax['radar'],
@@ -175,7 +175,10 @@ def draw_radar_chart(percentile,player_name,position_name,team_name,season,compa
                                     ha='right', va='center', color='#104618')
     
     new_name_arr = player_name.split(' ')
-    new_name = new_name_arr[0] + new_name_arr[1]
+    if len(new_name_arr) > 1:
+        new_name = new_name_arr[0] + new_name_arr[1]
+    else:
+        new_name = new_name_arr[0]
     if compare:
         outpath = f"Output/{new_name}_{season}_vs_{second_season}_spiderchart.png"
     else:
@@ -188,16 +191,16 @@ def draw_radar_chart(percentile,player_name,position_name,team_name,season,compa
 if __name__ == "__main__":
     # Get the data
     (season, player_name, position, 
-     position_name, team_name) = ('2025',
-                                  'Felipe Mora',
-                                  'ST', 
-                                  'Striker', 
+     position_name, team_name) = ('2024',
+                                  'Santiago Moreno',
+                                  'W', 
+                                  'Winger', 
                                   'Portland Timbers')
     (season2, player_name2, position2, 
-     position_name2, team_name2) = ('2024',
-                                  'Felipe Mora',
-                                  'ST', 
-                                  'Striker', 
+     position_name2, team_name2) = ('2023',
+                                  'Santiago Moreno',
+                                  'W', 
+                                  'Winger', 
                                   'Portland Timbers')
 
     grouped_data = get_data(season)
