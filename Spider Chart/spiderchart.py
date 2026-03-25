@@ -70,7 +70,7 @@ def calculate_percentiles(grouped_data, player_name='Felipe Carballo', position=
 
     value = player_df[['action_type','goals_added_raw_per90']]
 
-    position_data = grouped_data[(grouped_data['general_position'] == position) & (grouped_data['minutes_played'] > 800)]
+    position_data = grouped_data[(grouped_data['general_position'] == position) & (grouped_data['minutes_played'] > 200)] # CHANGE BACK TO 800 EVENTUALLY
     all_values = position_data[['action_type','goals_added_raw_per90']]
     params = ['Dribbling','Fouling','Interrupting','Passing','Receiving','Shooting']
 
@@ -191,17 +191,17 @@ def draw_radar_chart(percentile,player_name,position_name,team_name,season,compa
 if __name__ == "__main__":
     # Get the data
     (season, player_name, position, 
-     position_name, team_name) = ('2024',
-                                  'Matías Rojas',
-                                  'W', 
-                                  'Winger', 
-                                  'Miami, Portland')
+     position_name, team_name) = ('2026',
+                                  'Finn Surman',
+                                  'CB', 
+                                  'Defender', 
+                                  'Portland')
     (season2, player_name2, position2, 
      position_name2, team_name2) = ('2025',
-                                  'Santiago Moreno',
-                                  'W', 
-                                  'Winger', 
-                                  'Portland Timbers')
+                                  'Finn Surman',
+                                  'CB', 
+                                  'Defender', 
+                                  'Portland')
 
     grouped_data = get_data(season)
     grouped_data2 = get_data(season2)
@@ -211,8 +211,8 @@ if __name__ == "__main__":
     second_percentile = calculate_percentiles(grouped_data2, player_name=player_name2, position=position2)
 
     # Draw the radar chart
-    draw_radar_chart(percentile, player_name='Matías Rojas v. Santiago Moreno', 
+    draw_radar_chart(percentile, player_name='Finn Surman', 
                      position_name=position_name, team_name=team_name, 
-                     season = 'Rojas (2024)', compare=True,
-                     second_percentile=second_percentile,
-                     second_season='Moreno (2025)')
+                     season = 'Surman (2026)', compare=True, 
+                     second_percentile=second_percentile, 
+                     second_season='Surman (2025)')
