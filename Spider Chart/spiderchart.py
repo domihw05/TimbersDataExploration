@@ -192,12 +192,12 @@ if __name__ == "__main__":
     # Get the data
     (season, player_name, position, 
      position_name, team_name) = ('2024',
-                                  'Santiago Moreno',
+                                  'Matías Rojas',
                                   'W', 
                                   'Winger', 
-                                  'Portland Timbers')
+                                  'Miami, Portland')
     (season2, player_name2, position2, 
-     position_name2, team_name2) = ('2023',
+     position_name2, team_name2) = ('2025',
                                   'Santiago Moreno',
                                   'W', 
                                   'Winger', 
@@ -211,8 +211,8 @@ if __name__ == "__main__":
     second_percentile = calculate_percentiles(grouped_data2, player_name=player_name2, position=position2)
 
     # Draw the radar chart
-    draw_radar_chart(percentile, player_name=player_name, 
+    draw_radar_chart(percentile, player_name='Matías Rojas v. Santiago Moreno', 
                      position_name=position_name, team_name=team_name, 
-                     season = season, compare=True,
+                     season = 'Rojas (2024)', compare=True,
                      second_percentile=second_percentile,
-                     second_season=season2)
+                     second_season='Moreno (2025)')

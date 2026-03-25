@@ -17,7 +17,7 @@ def import_asa_timbers_data():
 
     # Step 1: Get Teams and Games
     teams = asa.get_teams()
-    games = asa.get_games(seasons=['2025'])
+    games = asa.get_games(seasons=['2026'])
     games['date_only'] = pd.to_datetime(games['date_time_utc']).dt.date
     games['game_id'] = games['game_id'].astype(str)
     games = games[['game_id', 'date_only']]
